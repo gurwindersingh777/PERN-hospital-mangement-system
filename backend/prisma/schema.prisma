@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
+  PATIENT
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PAID
+  VOID
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         UserRole
+  isActive     Boolean  @default(true)
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  doctor       Doctor?
+  patient      Patient?
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  doctors     Doctor[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Doctor {
+  id              String        @id @default(uuid())
+  userId          String        @unique
+  departmentId    String
+  specialty       String
+  qualification   String?
+  experienceYears Int?
+  workingHours    String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department      Department    @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  appointments    Appointment[]
+
+  @@index([departmentId])
+}
+
+model Patient {
+  id               String        @id @default(uuid())
+  userId           String        @unique
+  dateOfBirth      DateTime
+  gender           Gender?
+  bloodGroup       String?
+  contactNumber    String?
+  address          String?
+  emergencyContact String?
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments     Appointment[]
+
+  @@index([userId])
+}
+
+model Appointment {
+  id            String            @id @default(uuid())
+  doctorId      String
+  patientId     String
+  slotStart     DateTime
+  reason        String?
+  status        AppointmentStatus @default(PENDING)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  doctor        Doctor            @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+  patient       Patient           @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  medicalRecord MedicalRecord?
+  invoice       Invoice?
+
+  @@unique([doctorId, slotStart])
+  @@index([doctorId])
+  @@index([patientId])
+  @@index([slotStart])
+  @@index([status])
+}
+
+model MedicalRecord {
+  id            String         @id @default(uuid())
+  appointmentId String         @unique
+  diagnosis     String
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  appointment   Appointment    @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+  prescriptions Prescription[]
+
+  @@index([appointmentId])
+}
+
+model Prescription {
+  id              String        @id @default(uuid())
+  medicalRecordId String
+  medicineName    String
+  dosage          String
+  duration        String
+  instructions    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+
+  @@index([medicalRecordId])
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  appointmentId String        @unique
+  amount        Decimal       @db.Decimal(10, 2)
+  status        InvoiceStatus @default(UNPAID)
+  paymentMethod String?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+}

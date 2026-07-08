@@ -5,6 +5,7 @@ import { logger } from "./config/logger.js";
 import { env } from "./config/env.config.js";
 import { httpLogger } from "./middlewares/httpLogger.js";
 import { ErrorHandler } from "./middlewares/error.middleware.js";
+import authRouter from "./modules/auth/auth.routes.js";
 
 const app = express();
 const PORT = env.PORT;
@@ -18,6 +19,8 @@ app.use(cookieParser());
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, message: "OK" });
 });
+
+app.use("/api/auth", authRouter)
 
 app.use(ErrorHandler);
 

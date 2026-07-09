@@ -6,7 +6,11 @@ import { authenticate } from "../../middlewares/authenticate.middleware.js";
 
 const authRouter = Router();
 
-authRouter.post("/register", validate(registerSchema), authController.registerUser);
+authRouter.post(
+  "/register",
+  validate(registerSchema),
+  authController.registerUser
+);
 authRouter.post("/login", validate(loginSchema), authController.loginUser);
 authRouter.post("/refresh", authController.refresh);
 authRouter.post("/logout", authController.logoutUser);

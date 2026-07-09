@@ -20,7 +20,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ success: true, message: "OK" });
 });
 
-app.use("/api/auth", authRouter)
+app.use("/api/auth", authRouter);
 
 app.use(ErrorHandler);
 

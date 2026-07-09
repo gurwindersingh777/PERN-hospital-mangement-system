@@ -10,7 +10,7 @@ const envSchema = z.object({
   REFRESH_TOKEN_SECRET: z.string(),
   ACCESS_TOKEN_EXPIRY: z.string(),
   REFRESH_TOKEN_EXPIRY: z.string(),
-  SALT_ROUNDS: z.coerce.number()
+  SALT_ROUNDS: z.coerce.number(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

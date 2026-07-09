@@ -4,7 +4,6 @@ import { UNAUTHORIZED } from "../constants/statusCode.js";
 import { verifyAccessToken } from "../modules/auth/auth.helper.js";
 import { authRepository } from "../modules/auth/auth.repository.js";
 
-
 export const authenticate = async (
   req: Request,
   res: Response,
@@ -14,7 +13,7 @@ export const authenticate = async (
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-      throw new ApiError(UNAUTHORIZED, "Authentication required")
+      throw new ApiError(UNAUTHORIZED, "Authentication required");
     }
 
     const accessToken = authHeader.split(" ")[1];
@@ -23,9 +22,9 @@ export const authenticate = async (
       throw new ApiError(UNAUTHORIZED, "Access token missing");
     }
 
-    const payload = verifyAccessToken(accessToken)
+    const payload = verifyAccessToken(accessToken);
 
-    const user = await authRepository.findUserById(payload.userId)
+    const user = await authRepository.findUserById(payload.userId);
 
     if (!user) {
       throw new ApiError(UNAUTHORIZED, "Invalid refresh token");
@@ -37,11 +36,11 @@ export const authenticate = async (
 
     req.user = {
       userId: user.id,
-      role: user.role
-    }
+      role: user.role,
+    };
 
-    next()
+    next();
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};

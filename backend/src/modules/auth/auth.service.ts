@@ -1,38 +1,42 @@
 import { UserRole } from "@prisma/client";
-import { CONFLICT, NOT_FOUND, UNAUTHORIZED } from "../../constants/statusCode.js";
+import { CONFLICT, UNAUTHORIZED } from "../../constants/statusCode.js";
 import { ApiError } from "../../utils/ApiError.js";
-import { comparePassword, generateAccessToken, generateRefreshToken, hashPassword, verifyRefreshToken } from "./auth.helper.js";
+import {
+  comparePassword,
+  generateAccessToken,
+  generateRefreshToken,
+  hashPassword,
+  verifyRefreshToken,
+} from "./auth.helper.js";
 
 import { LoginInput, RegisterInput } from "./auth.schema.js";
 import { authRepository } from "./auth.repository.js";
 import { toUserResponse } from "./auth.response.js";
 
-
 export const authService = {
-
   async register(data: RegisterInput) {
     const existingUser = await authRepository.findUserByEmail(data.email);
 
     if (existingUser) {
-      throw new ApiError(CONFLICT, "Email already registered")
+      throw new ApiError(CONFLICT, "Email already registered");
     }
 
-    const hashedPassword = await hashPassword(data.password)
+    const hashedPassword = await hashPassword(data.password);
 
     const user = await authRepository.createUser({
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      role: UserRole.PATIENT
-    })
+      role: UserRole.PATIENT,
+    });
 
     const payload = {
       userId: user.id,
-      role: user.role
-    }
+      role: user.role,
+    };
 
-    const accessToken = generateAccessToken(payload)
-    const refreshToken = generateRefreshToken(payload)
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
 
     return {
       user: toUserResponse(user),
@@ -56,10 +60,10 @@ export const authService = {
 
     const payload = {
       userId: user.id,
-      role: user.role
-    }
-    const accessToken = generateAccessToken(payload)
-    const refreshToken = generateRefreshToken(payload)
+      role: user.role,
+    };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
 
     return {
       user: toUserResponse(user),
@@ -70,32 +74,35 @@ export const authService = {
 
   async refresh(refreshtoken: string) {
     if (!refreshtoken) {
-      throw new ApiError(UNAUTHORIZED, "Refresh token is required")
+      throw new ApiError(UNAUTHORIZED, "Refresh token is required");
     }
 
     const payload = verifyRefreshToken(refreshtoken);
-    const user = await authRepository.findUserById(payload.userId)
+    const user = await authRepository.findUserById(payload.userId);
 
     if (!user) {
-      throw new ApiError(UNAUTHORIZED, "User not found")
+      throw new ApiError(UNAUTHORIZED, "User not found");
     }
 
     if (!user.isActive) {
       throw new ApiError(UNAUTHORIZED, "Account is inactive");
     }
 
-    const accessToken = generateAccessToken({ userId: user.id, role: user.role })
+    const accessToken = generateAccessToken({
+      userId: user.id,
+      role: user.role,
+    });
 
-    return accessToken
+    return accessToken;
   },
 
   async currentUser(userId: string) {
-    const user = await authRepository.findUserById(userId)
+    const user = await authRepository.findUserById(userId);
 
     if (!user) {
-      throw new ApiError(UNAUTHORIZED, "User not found")
+      throw new ApiError(UNAUTHORIZED, "User not found");
     }
 
-    return toUserResponse(user)
-  }
-}
+    return toUserResponse(user);
+  },
+};

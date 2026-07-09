@@ -6,10 +6,9 @@ import { clearAuthCookies, setAuthCookies } from "./auth.helper.js";
 import { authService } from "./auth.service.js";
 
 export const authController = {
-
-  registerUser: (AsyncHandler(async (req: Request, res: Response) => {
+  registerUser: AsyncHandler(async (req: Request, res: Response) => {
     const result = await authService.register(req.body);
-    setAuthCookies(res, result.refreshToken)
+    setAuthCookies(res, result.refreshToken);
 
     return res.status(CREATED).json(
       new ApiResponse(
@@ -21,11 +20,11 @@ export const authController = {
         "Registration successful"
       )
     );
-  })),
+  }),
 
-  loginUser: (AsyncHandler(async (req: Request, res: Response) => {
+  loginUser: AsyncHandler(async (req: Request, res: Response) => {
     const result = await authService.login(req.body);
-    setAuthCookies(res, result.refreshToken)
+    setAuthCookies(res, result.refreshToken);
 
     return res.status(OK).json(
       new ApiResponse(
@@ -37,37 +36,33 @@ export const authController = {
         "Login successful"
       )
     );
-  })),
+  }),
 
-  refresh: (AsyncHandler(async (req: Request, res: Response) => {
+  refresh: AsyncHandler(async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
     const accessToken = await authService.refresh(refreshToken);
 
-    return res.status(OK).json(
-      new ApiResponse(
-        OK,
-        { accessToken },
-        "Token refreshed successfully"
-      )
-    );
-  })),
+    return res
+      .status(OK)
+      .json(
+        new ApiResponse(OK, { accessToken }, "Token refreshed successfully")
+      );
+  }),
 
-  logoutUser: (AsyncHandler(async (_req: Request, res: Response) => {
-    clearAuthCookies(res)
+  logoutUser: AsyncHandler(async (_req: Request, res: Response) => {
+    clearAuthCookies(res);
 
-    return res.status(OK).json(
-      new ApiResponse(OK, null, "Logout successfully")
-    );
-  })),
+    return res
+      .status(OK)
+      .json(new ApiResponse(OK, null, "Logout successfully"));
+  }),
 
-  getCurrentUser: (AsyncHandler(async (req: Request, res: Response) => {
-
+  getCurrentUser: AsyncHandler(async (req: Request, res: Response) => {
     const user = await authService.currentUser(req.user!.userId);
 
-    return res.status(OK).json(
-      new ApiResponse(OK, user, "User profile fetched successfully")
-    );
-  }))
-
-}
+    return res
+      .status(OK)
+      .json(new ApiResponse(OK, user, "User profile fetched successfully"));
+  }),
+};

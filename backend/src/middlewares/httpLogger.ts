@@ -1,4 +1,3 @@
-
 import { pinoHttp } from "pino-http";
 import { logger } from "../config/logger.js";
 
@@ -14,6 +13,8 @@ export const httpLogger = pinoHttp({
       };
     },
 
-    res(res) { return { statusCode: res.statusCode } }
-  }
+    res(res) {
+      return { statusCode: res.statusCode };
+    },
+  },
 });

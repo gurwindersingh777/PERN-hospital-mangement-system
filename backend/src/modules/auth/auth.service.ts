@@ -1,7 +1,7 @@
 import { UserRole } from "@prisma/client";
-import { CONFLICT, UNAUTHORIZED } from "../../constants/statusCode.js";
+import { CONFLICT, NOT_FOUND, UNAUTHORIZED } from "../../constants/statusCode.js";
 import { ApiError } from "../../utils/ApiError.js";
-import { comparePassword, generateAccessToken, generateRefreshToken, hashPassword } from "./auth.helper.js";
+import { comparePassword, generateAccessToken, generateRefreshToken, hashPassword, verifyRefreshToken } from "./auth.helper.js";
 
 import { LoginInput, RegisterInput } from "./auth.schema.js";
 import { authRepository } from "./auth.repository.js";
@@ -66,6 +66,36 @@ export const authService = {
       accessToken,
       refreshToken,
     };
-  }
+  },
 
+  async refresh(refreshtoken: string) {
+    if (!refreshtoken) {
+      throw new ApiError(UNAUTHORIZED, "Refresh token is required")
+    }
+
+    const payload = verifyRefreshToken(refreshtoken);
+    const user = await authRepository.findUserById(payload.userId)
+
+    if (!user) {
+      throw new ApiError(UNAUTHORIZED, "User not found")
+    }
+
+    if (!user.isActive) {
+      throw new ApiError(UNAUTHORIZED, "Account is inactive");
+    }
+
+    const accessToken = generateAccessToken({ userId: user.id, role: user.role })
+
+    return accessToken
+  },
+
+  async currentUser(userId: string) {
+    const user = await authRepository.findUserById(userId)
+
+    if (!user) {
+      throw new ApiError(UNAUTHORIZED, "User not found")
+    }
+
+    return toUserResponse(user)
+  }
 }

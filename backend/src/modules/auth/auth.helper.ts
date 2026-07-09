@@ -27,11 +27,11 @@ export function generateRefreshToken(payload: JwtPayloadType) {
 }
 
 export function verifyAccessToken(token: string) {
-  return jwt.verify(token, env.ACCESS_TOKEN_SECRET) as JwtPayload
+  return jwt.verify(token, env.ACCESS_TOKEN_SECRET) as JwtPayloadType
 }
 
 export function verifyRefreshToken(token: string) {
-  return jwt.verify(token, env.REFRESH_TOKEN_SECRET) as JwtPayload
+  return jwt.verify(token, env.REFRESH_TOKEN_SECRET) as JwtPayloadType
 }
 
 const cookieOptions: CookieOptions = {

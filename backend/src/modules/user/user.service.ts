@@ -28,11 +28,16 @@ export const userService = {
   },
 
   async findAll(query: GetUsersQuery) {
-    const page = query.page;
-    const limit = query.limit;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
     const skip = (page - 1) * limit;
     const where: Prisma.UserWhereInput = {};
+
     if (query.role) {
+      where.role = query.role;
+    }
+
+    if (query.isActive !== undefined) {
       where.isActive = query.isActive;
     }
 

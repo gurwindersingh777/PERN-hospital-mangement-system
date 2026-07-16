@@ -5,7 +5,6 @@ import { toDepartmentResponse } from "./department.response.js";
 import { DepartmentInput, UpdateDepartmentInput } from "./department.schema.js";
 
 export const departmentService = {
-
   async createDepartment(data: DepartmentInput) {
     const existingDepartment = await departmentRepository.findByName(data.name);
 
@@ -33,7 +32,6 @@ export const departmentService = {
   },
 
   async updateDepartment(id: string, data: UpdateDepartmentInput) {
-
     const existing = await departmentRepository.findById(id);
 
     if (!existing) {
@@ -48,8 +46,7 @@ export const departmentService = {
       }
     }
 
-
     const department = await departmentRepository.update(id, data);
     return toDepartmentResponse(department);
   },
-}
+};

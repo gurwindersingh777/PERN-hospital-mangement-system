@@ -12,26 +12,27 @@ export const ErrorHandler: ErrorRequestHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-
   if (req.path === REFRESH_PATH) {
     clearAuthCookies(res);
   }
 
-
   if (err instanceof z.ZodError) {
-    logger.warn({
-      requestId: req.id,
-      method: req.method,
-      path: req.originalUrl,
-      errors: err.issues.map(issue => ({
-        path: issue.path.join("."),
-        message: issue.message,
-      })),
-    }, "Validation failed");
+    logger.warn(
+      {
+        requestId: req.id,
+        method: req.method,
+        path: req.originalUrl,
+        errors: err.issues.map((issue) => ({
+          path: issue.path.join("."),
+          message: issue.message,
+        })),
+      },
+      "Validation failed"
+    );
 
     return res.status(BAD_REQUEST).json({
       success: false,
-      errors: err.issues.map(issue => ({
+      errors: err.issues.map((issue) => ({
         path: issue.path.join("."),
         message: issue.message,
       })),
@@ -39,21 +40,26 @@ export const ErrorHandler: ErrorRequestHandler = (
   }
 
   if (err instanceof ApiError) {
-
     if (err.statusCode >= 500) {
-      logger.error({
-        requestId: req.id,
-        method: req.method,
-        path: req.originalUrl,
-        message: err.message,
-      }, "Server error");
+      logger.error(
+        {
+          requestId: req.id,
+          method: req.method,
+          path: req.originalUrl,
+          message: err.message,
+        },
+        "Server error"
+      );
     } else {
-      logger.warn({
-        requestId: req.id,
-        method: req.method,
-        path: req.originalUrl,
-        message: err.message,
-      }, "Request failed");
+      logger.warn(
+        {
+          requestId: req.id,
+          method: req.method,
+          path: req.originalUrl,
+          message: err.message,
+        },
+        "Request failed"
+      );
     }
 
     return res.status(err.statusCode).json({
@@ -63,12 +69,15 @@ export const ErrorHandler: ErrorRequestHandler = (
     });
   }
 
-  logger.error({
-    requestId: req.id,
-    method: req.method,
-    path: req.originalUrl,
-    err,
-  }, "Unhandled server error");
+  logger.error(
+    {
+      requestId: req.id,
+      method: req.method,
+      path: req.originalUrl,
+      err,
+    },
+    "Unhandled server error"
+  );
 
   return res.status(INTERNAL_SERVER_ERROR).json({
     success: false,

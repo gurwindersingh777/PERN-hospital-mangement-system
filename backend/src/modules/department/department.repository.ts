@@ -2,7 +2,6 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma.js";
 
 export const departmentRepository = {
-
   async create(data: Prisma.DepartmentCreateInput) {
     return prisma.department.create({ data });
   },
@@ -12,7 +11,7 @@ export const departmentRepository = {
   },
 
   async findAll() {
-    return prisma.department.findMany({ orderBy: { name : "asc" } });
+    return prisma.department.findMany({ orderBy: { name: "asc" } });
   },
 
   async findByName(name: string) {
@@ -24,5 +23,5 @@ export const departmentRepository = {
       where: { id },
       data,
     });
-  }
-}
+  },
+};

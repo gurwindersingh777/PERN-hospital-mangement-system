@@ -6,6 +6,6 @@ export const toDepartmentResponse = (department: Department) => {
     name: department.name,
     description: department.description,
     createdAt: department.createdAt,
-    updatedAt: department.updatedAt
+    updatedAt: department.updatedAt,
   };
 };

@@ -11,13 +11,15 @@ export const departmentSchema = z.object({
       .string()
       .trim()
       .max(200, { message: "Description must be at most 200 characters long" })
-      .optional()
-  })
-})
+      .optional(),
+  }),
+});
 
 export const updateDepartmentSchema = z.object({
   body: departmentSchema.shape.body.partial(),
 });
 
 export type DepartmentInput = z.infer<typeof departmentSchema>["body"];
-export type UpdateDepartmentInput = z.infer<typeof updateDepartmentSchema>["body"];
+export type UpdateDepartmentInput = z.infer<
+  typeof updateDepartmentSchema
+>["body"];

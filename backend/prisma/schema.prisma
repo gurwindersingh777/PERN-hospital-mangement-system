@@ -63,6 +63,7 @@ model Doctor {
   qualification   String?
   experienceYears Int?
   workingHours    String
+  phoneNumber     String?
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   department      Department    @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   appointments    Appointment[]

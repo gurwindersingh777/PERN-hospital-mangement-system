@@ -11,9 +11,24 @@ import {
 
 const userRouter = Router();
 
-userRouter.post("/",authorizeRole(UserRole.ADMIN),validate(createUserSchema),userController.create);
-userRouter.get("/:id",authorizeRole(UserRole.ADMIN),validate(userParamsSchema),userController.findById);
+userRouter.post(
+  "/",
+  authorizeRole(UserRole.ADMIN),
+  validate(createUserSchema),
+  userController.create
+);
+userRouter.get(
+  "/:id",
+  authorizeRole(UserRole.ADMIN),
+  validate(userParamsSchema),
+  userController.findById
+);
 userRouter.get("/", authorizeRole(UserRole.ADMIN), userController.findAll);
-userRouter.patch("/:id",authorizeRole(UserRole.ADMIN),validate(updateUserSchema),userController.update);
+userRouter.patch(
+  "/:id",
+  authorizeRole(UserRole.ADMIN),
+  validate(updateUserSchema),
+  userController.update
+);
 
 export default userRouter;

@@ -7,7 +7,7 @@ export const httpLogger = pinoHttp({
 
   genReqId: () => randomUUID(),
 
-  customSuccessMessage(req, res) {
+  customSuccessMessage(req, _res) {
     return `${req.method} ${req.url} completed`;
   },
 

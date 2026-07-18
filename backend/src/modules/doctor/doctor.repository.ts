@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../lib/prisma.js";
 
 export const doctorRepository = {
-  create: async (data: Prisma.DoctorUncheckedCreateInput) => {
+  create(data: Prisma.DoctorUncheckedCreateInput) {
     return prisma.doctor.create({
       data,
       include: {
@@ -12,7 +12,7 @@ export const doctorRepository = {
     });
   },
 
-  findById: async (id: string) => {
+  findById(id: string) {
     return prisma.doctor.findUnique({
       where: { id },
       include: {
@@ -33,7 +33,7 @@ export const doctorRepository = {
     });
   },
 
-  findByUserId: async (userId: string) => {
+  findByUserId(userId: string) {
     return prisma.doctor.findUnique({ where: { userId } });
   },
 
@@ -48,15 +48,15 @@ export const doctorRepository = {
     });
   },
 
-  findDepartmentById: async (departmentId: string) => {
+  findDepartmentById(departmentId: string) {
     return prisma.department.findUnique({ where: { id: departmentId } });
   },
 
-  findUserById: async (userId: string) => {
+  findUserById(userId: string) {
     return prisma.user.findUnique({ where: { id: userId } });
   },
 
-  count: async () => {
+  count() {
     return prisma.doctor.count();
   },
 };

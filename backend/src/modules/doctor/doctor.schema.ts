@@ -4,10 +4,7 @@ export const doctorSchema = z.object({
   body: z.object({
     userId: z.string().uuid(),
     departmentId: z.string().uuid(),
-    phoneNumber: z
-      .string()
-      .regex(/^\+?[1-9][\d]{0,15}$/)
-      .optional(),
+    phoneNumber: z.string().trim().regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number").optional(),
     qualification: z.string().min(2).max(100).optional(),
     specialty: z.string().min(2).max(100),
     experienceYears: z.number().int().min(0).max(60).optional(),

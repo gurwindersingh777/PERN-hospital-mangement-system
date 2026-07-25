@@ -1,9 +1,10 @@
-import { AppointmentStatus } from "@prisma/client";
+import { AppointmentStatus, Prisma } from "@prisma/client";
 import { BAD_REQUEST, CONFLICT, NOT_FOUND } from "../../constants/statusCode.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { appointmentRepository } from "./appointment.repository.js";
 import { toAppointmentResponse } from "./appointment.response.js";
 import { AppointmentInput, GetAppointmentsInput, UpdateAppointmentInput } from "./appointment.schema.js";
+import { getSlotEnd, isValidSlotTime, isWithinWorkingHours } from "./appointment.utils.js";
 
 const allowedTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
   PENDING: ["CONFIRMED", "CANCELLED"],
@@ -19,6 +20,13 @@ function isValidStatusTransition(current: AppointmentStatus, next: AppointmentSt
 export const appointmentService = {
 
   async create(data: AppointmentInput) {
+    console.log({
+  iso: data.slotStart.toISOString(),
+  hours: data.slotStart.getHours(),
+  minutes: data.slotStart.getMinutes(),
+  utcHours: data.slotStart.getUTCHours(),
+  utcMinutes: data.slotStart.getUTCMinutes(),
+});
     const doctor = await appointmentRepository.findDoctorById(data.doctorId);
 
     if (!doctor) {
@@ -35,13 +43,37 @@ export const appointmentService = {
       throw new ApiError(BAD_REQUEST, "Invalid Slot timing")
     }
 
-    const alreadyBooked = await appointmentRepository.findByDoctorAndSlot(data.doctorId, data.slotStart);
-
-    if (alreadyBooked) {
-      throw new ApiError(CONFLICT, "There is an already existing appointment in this time slot. Please choose another time slot.")
+    if (!isValidSlotTime(data.slotStart)) {
+      throw new ApiError(BAD_REQUEST, "Appointments can only start at :00 or :30.")
     }
 
-    const appointment = await appointmentRepository.create(data);
+    const slotEnd = getSlotEnd(data.slotStart);
+
+    if (
+      !isWithinWorkingHours(
+        data.slotStart,
+        slotEnd,
+        doctor.workStartTime,
+        doctor.workEndTime
+      )
+    ) {
+      throw new ApiError(
+        BAD_REQUEST,
+        `Doctor is available only between ${doctor.workStartTime} and ${doctor.workEndTime}.`
+      );
+    }
+
+    const conflict = await appointmentRepository.findDoctorConflictingAppointment(
+      data.doctorId,
+      data.slotStart,
+      slotEnd
+    );
+
+    if (conflict) {
+      throw new ApiError(CONFLICT, "Doctor already has an appointment during this time.");
+    }
+
+    const appointment = await appointmentRepository.create({ ...data, slotEnd });
 
     return toAppointmentResponse(appointment);
   },
@@ -78,32 +110,87 @@ export const appointmentService = {
   },
 
   async update(id: string, data: UpdateAppointmentInput) {
-
     const existing = await appointmentRepository.findById(id);
 
     if (!existing) {
       throw new ApiError(NOT_FOUND, "Appointment not found");
     }
 
+    if (
+      data.status &&
+      !isValidStatusTransition(existing.status, data.status)
+    ) {
+      throw new ApiError(
+        BAD_REQUEST,
+        "Invalid appointment status transition"
+      );
+    }
+
+    const updateData: Prisma.AppointmentUpdateInput = { ...data };
+
     if (data.slotStart) {
       if (data.slotStart.getTime() <= Date.now()) {
-        throw new ApiError(BAD_REQUEST, "Invalid Slot timing")
+        throw new ApiError(
+          BAD_REQUEST,
+          "Appointment must be scheduled in the future."
+        );
       }
 
-      const alreadyBooked = await appointmentRepository.findByDoctorAndSlot(existing.doctorId, data.slotStart);
-
-      if (alreadyBooked && alreadyBooked.id !== existing.id) {
-        throw new ApiError(CONFLICT, "Doctor already has an appointment at this time")
+      if (!isValidSlotTime(data.slotStart)) {
+        throw new ApiError(
+          BAD_REQUEST,
+          "Appointments can only start at :00 or :30."
+        );
       }
+
+      const slotEnd = getSlotEnd(data.slotStart);
+
+      const doctor = await appointmentRepository.findDoctorById(
+        existing.doctorId
+      );
+
+      if (!doctor) {
+        throw new ApiError(
+          NOT_FOUND,
+          "Doctor does not exist"
+        );
+      }
+
+      if (
+        !isWithinWorkingHours(
+          data.slotStart,
+          slotEnd,
+          doctor.workStartTime,
+          doctor.workEndTime
+        )
+      ) {
+        throw new ApiError(
+          BAD_REQUEST,
+          `Doctor is available only between ${doctor.workStartTime} and ${doctor.workEndTime}.`
+        );
+      }
+
+      const conflict =
+        await appointmentRepository.findDoctorConflictingAppointment(
+          existing.doctorId,
+          data.slotStart,
+          slotEnd,
+          existing.id
+        );
+
+      if (conflict) {
+        throw new ApiError(CONFLICT, "Doctor already has another appointment during this time.");
+      }
+
+      updateData.slotStart = data.slotStart;
+      updateData.slotEnd = slotEnd;
     }
 
-
-    if (data.status && !isValidStatusTransition(existing.status, data.status)) {
-      throw new ApiError(BAD_REQUEST, "Invalid appointment status transition");
-    }
-
-    const appointment = await appointmentRepository.update(id, data);
+    const appointment = await appointmentRepository.update(
+      id,
+      updateData
+    );
 
     return toAppointmentResponse(appointment);
-  },
+  }
 }

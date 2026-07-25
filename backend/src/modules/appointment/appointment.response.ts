@@ -3,6 +3,7 @@ import { AppointmentWithRelations } from "./appointment.types.js";
 export const toAppointmentResponse = (appointment: AppointmentWithRelations) => ({
   id: appointment.id,
   slotStart: appointment.slotStart,
+  slotEnd: appointment.slotEnd,
   reason: appointment.reason,
   status: appointment.status,
 
@@ -11,7 +12,8 @@ export const toAppointmentResponse = (appointment: AppointmentWithRelations) => 
     specialty: appointment.doctor.specialty,
     qualification: appointment.doctor.qualification,
     experienceYears: appointment.doctor.experienceYears,
-    workingHours: appointment.doctor.workingHours,
+    workStartTime: appointment.doctor.workStartTime,
+    workEndTime: appointment.doctor.workEndTime,
 
     department: {
       id: appointment.doctor.department.id,

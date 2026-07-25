@@ -61,13 +61,25 @@ export const appointmentRepository = {
     });
   },
 
-  findByDoctorAndSlot(doctorId: string, slotStart: Date) {
-    return prisma.appointment.findUnique({
+  findDoctorConflictingAppointment(
+    doctorId: string,
+    slotStart: Date,
+    slotEnd: Date,
+    excludeAppointmentId?: string
+  ) {
+    return prisma.appointment.findFirst({
       where: {
-        doctorId_slotStart: {
-          doctorId,
-          slotStart,
-        },
+        doctorId,
+        status: { not: "CANCELLED" },
+
+        ...(excludeAppointmentId && {
+          NOT: {
+            id: excludeAppointmentId,
+          },
+        }),
+
+        slotStart: { lt: slotEnd },
+        slotEnd: { gt: slotStart },
       },
     });
   },

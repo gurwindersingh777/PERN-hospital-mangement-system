@@ -1,0 +1,3 @@
+export const APPOINTMENT_DURATION_MINUTES = 30;
+
+export const ALLOWED_SLOT_MINUTES = [0, 30];

@@ -8,7 +8,8 @@ export const doctorSchema = z.object({
     qualification: z.string().min(2).max(100).optional(),
     specialty: z.string().min(2).max(100),
     experienceYears: z.number().int().min(0).max(60).optional(),
-    workingHours: z.string().min(2).max(100),
+    workStartTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
+    workEndTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/),
   }),
 });
 
@@ -23,7 +24,8 @@ export const updateDoctorSchema = z.object({
     qualification: z.string().min(2).max(100).optional(),
     specialty: z.string().min(2).max(100).optional(),
     experienceYears: z.number().int().min(0).max(60).optional(),
-    workingHours: z.string().min(2).max(100).optional(),
+    workStartTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(),
+    workEndTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(),
   }),
 });
 

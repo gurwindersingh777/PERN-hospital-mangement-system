@@ -5,7 +5,8 @@ export const toDoctorResponse = (doctor: DoctorWithRelations) => ({
   specialty: doctor.specialty,
   qualification: doctor.qualification,
   experienceYears: doctor.experienceYears,
-  workingHours: doctor.workingHours,
+  workStartTime: doctor.workStartTime,
+  workEndTime: doctor.workEndTime,
   phoneNumber: doctor.phoneNumber,
 
   user: {

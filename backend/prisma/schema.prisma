@@ -44,17 +44,17 @@ enum BloodGroup {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String         @unique
-  password      String
-  role          UserRole
-  isActive      Boolean        @default(true)
-  isVerified    Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  doctor        Doctor?
-  patient       Patient?
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       UserRole
+  isActive   Boolean  @default(true)
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  doctor     Doctor?
+  patient    Patient?
 }
 
 model Department {
@@ -73,7 +73,8 @@ model Doctor {
   specialty       String
   qualification   String?
   experienceYears Int?
-  workingHours    String
+  workStartTime   String?
+  workEndTime     String?
   phoneNumber     String?
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   department      Department    @relation(fields: [departmentId], references: [id], onDelete: Restrict)
@@ -102,6 +103,7 @@ model Appointment {
   doctorId      String
   patientId     String
   slotStart     DateTime
+  slotEnd       DateTime?
   reason        String?
   status        AppointmentStatus @default(PENDING)
   createdAt     DateTime          @default(now())
@@ -111,10 +113,9 @@ model Appointment {
   medicalRecord MedicalRecord?
   invoice       Invoice?
 
-  @@unique([doctorId, slotStart])
-  @@index([doctorId])
+  @@index([doctorId, slotStart])
+  @@index([doctorId, status, slotStart])
   @@index([patientId])
-  @@index([slotStart])
   @@index([status])
 }
 

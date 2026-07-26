@@ -1,10 +1,22 @@
 import { AppointmentStatus, Prisma } from "@prisma/client";
-import { BAD_REQUEST, CONFLICT, NOT_FOUND } from "../../constants/statusCode.js";
+import {
+  BAD_REQUEST,
+  CONFLICT,
+  NOT_FOUND,
+} from "../../constants/statusCode.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { appointmentRepository } from "./appointment.repository.js";
 import { toAppointmentResponse } from "./appointment.response.js";
-import { AppointmentInput, GetAppointmentsInput, UpdateAppointmentInput } from "./appointment.schema.js";
-import { getSlotEnd, isValidSlotTime, isWithinWorkingHours } from "./appointment.utils.js";
+import {
+  AppointmentInput,
+  GetAppointmentsInput,
+  UpdateAppointmentInput,
+} from "./appointment.schema.js";
+import {
+  getSlotEnd,
+  isValidSlotTime,
+  isWithinWorkingHours,
+} from "./appointment.utils.js";
 
 const allowedTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
   PENDING: ["CONFIRMED", "CANCELLED"],
@@ -13,38 +25,43 @@ const allowedTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
   CANCELLED: [],
 };
 
-function isValidStatusTransition(current: AppointmentStatus, next: AppointmentStatus): boolean {
+function isValidStatusTransition(
+  current: AppointmentStatus,
+  next: AppointmentStatus
+): boolean {
   return allowedTransitions[current].includes(next);
 }
 
 export const appointmentService = {
-
   async create(data: AppointmentInput) {
     console.log({
-  iso: data.slotStart.toISOString(),
-  hours: data.slotStart.getHours(),
-  minutes: data.slotStart.getMinutes(),
-  utcHours: data.slotStart.getUTCHours(),
-  utcMinutes: data.slotStart.getUTCMinutes(),
-});
+      iso: data.slotStart.toISOString(),
+      hours: data.slotStart.getHours(),
+      minutes: data.slotStart.getMinutes(),
+      utcHours: data.slotStart.getUTCHours(),
+      utcMinutes: data.slotStart.getUTCMinutes(),
+    });
     const doctor = await appointmentRepository.findDoctorById(data.doctorId);
 
     if (!doctor) {
-      throw new ApiError(NOT_FOUND, "Doctor does not exist")
+      throw new ApiError(NOT_FOUND, "Doctor does not exist");
     }
 
     const patient = await appointmentRepository.findPatientById(data.patientId);
 
     if (!patient) {
-      throw new ApiError(NOT_FOUND, "Patient does not exist")
+      throw new ApiError(NOT_FOUND, "Patient does not exist");
     }
 
     if (data.slotStart.getTime() <= Date.now()) {
-      throw new ApiError(BAD_REQUEST, "Invalid Slot timing")
+      throw new ApiError(BAD_REQUEST, "Invalid Slot timing");
     }
 
     if (!isValidSlotTime(data.slotStart)) {
-      throw new ApiError(BAD_REQUEST, "Appointments can only start at :00 or :30.")
+      throw new ApiError(
+        BAD_REQUEST,
+        "Appointments can only start at :00 or :30."
+      );
     }
 
     const slotEnd = getSlotEnd(data.slotStart);
@@ -63,17 +80,24 @@ export const appointmentService = {
       );
     }
 
-    const conflict = await appointmentRepository.findDoctorConflictingAppointment(
-      data.doctorId,
-      data.slotStart,
-      slotEnd
-    );
+    const conflict =
+      await appointmentRepository.findDoctorConflictingAppointment(
+        data.doctorId,
+        data.slotStart,
+        slotEnd
+      );
 
     if (conflict) {
-      throw new ApiError(CONFLICT, "Doctor already has an appointment during this time.");
+      throw new ApiError(
+        CONFLICT,
+        "Doctor already has an appointment during this time."
+      );
     }
 
-    const appointment = await appointmentRepository.create({ ...data, slotEnd });
+    const appointment = await appointmentRepository.create({
+      ...data,
+      slotEnd,
+    });
 
     return toAppointmentResponse(appointment);
   },
@@ -95,8 +119,8 @@ export const appointmentService = {
 
     const [appointments, total] = await Promise.all([
       appointmentRepository.findAll(skip, limit),
-      appointmentRepository.count()
-    ])
+      appointmentRepository.count(),
+    ]);
 
     return {
       data: appointments.map(toAppointmentResponse),
@@ -116,14 +140,8 @@ export const appointmentService = {
       throw new ApiError(NOT_FOUND, "Appointment not found");
     }
 
-    if (
-      data.status &&
-      !isValidStatusTransition(existing.status, data.status)
-    ) {
-      throw new ApiError(
-        BAD_REQUEST,
-        "Invalid appointment status transition"
-      );
+    if (data.status && !isValidStatusTransition(existing.status, data.status)) {
+      throw new ApiError(BAD_REQUEST, "Invalid appointment status transition");
     }
 
     const updateData: Prisma.AppointmentUpdateInput = { ...data };
@@ -150,10 +168,7 @@ export const appointmentService = {
       );
 
       if (!doctor) {
-        throw new ApiError(
-          NOT_FOUND,
-          "Doctor does not exist"
-        );
+        throw new ApiError(NOT_FOUND, "Doctor does not exist");
       }
 
       if (
@@ -179,18 +194,18 @@ export const appointmentService = {
         );
 
       if (conflict) {
-        throw new ApiError(CONFLICT, "Doctor already has another appointment during this time.");
+        throw new ApiError(
+          CONFLICT,
+          "Doctor already has another appointment during this time."
+        );
       }
 
       updateData.slotStart = data.slotStart;
       updateData.slotEnd = slotEnd;
     }
 
-    const appointment = await appointmentRepository.update(
-      id,
-      updateData
-    );
+    const appointment = await appointmentRepository.update(id, updateData);
 
     return toAppointmentResponse(appointment);
-  }
-}
+  },
+};

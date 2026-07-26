@@ -1,8 +1,16 @@
 import { UserRole } from "@prisma/client";
-import { BAD_REQUEST, CONFLICT, NOT_FOUND } from "../../constants/statusCode.js";
+import {
+  BAD_REQUEST,
+  CONFLICT,
+  NOT_FOUND,
+} from "../../constants/statusCode.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { patientRepository } from "./patient.repository.js";
-import { GetPatientsInput, PatientInput, UpdatePatientInput } from "./patient.schema.js";
+import {
+  GetPatientsInput,
+  PatientInput,
+  UpdatePatientInput,
+} from "./patient.schema.js";
 import { toPatientResponse } from "./patient.response.js";
 
 export const patientService = {

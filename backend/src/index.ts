@@ -12,6 +12,7 @@ import departmentRouter from "./modules/department/department.routes.js";
 import doctorRouter from "./modules/doctor/doctor.routes.js";
 import patientRouter from "./modules/patient/patient.routes.js";
 import appointmentRouter from "./modules/appointment/appointment.routes.js";
+import medicalRecordRouter from "./modules/medical-record/medicalRecord.routes.js";
 
 const app = express();
 const PORT = env.PORT;
@@ -32,6 +33,7 @@ app.use("/api/departments", authenticate, departmentRouter);
 app.use("/api/doctors", authenticate, doctorRouter);
 app.use("/api/patients", authenticate, patientRouter);
 app.use("/api/appointments", authenticate, appointmentRouter);
+app.use("/api/medical-records", authenticate, medicalRecordRouter);
 
 app.use(ErrorHandler);
 

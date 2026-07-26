@@ -4,7 +4,11 @@ export const doctorSchema = z.object({
   body: z.object({
     userId: z.string().uuid(),
     departmentId: z.string().uuid(),
-    phoneNumber: z.string().trim().regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number").optional(),
+    phoneNumber: z
+      .string()
+      .trim()
+      .regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number")
+      .optional(),
     qualification: z.string().min(2).max(100).optional(),
     specialty: z.string().min(2).max(100),
     experienceYears: z.number().int().min(0).max(60).optional(),
@@ -24,8 +28,14 @@ export const updateDoctorSchema = z.object({
     qualification: z.string().min(2).max(100).optional(),
     specialty: z.string().min(2).max(100).optional(),
     experienceYears: z.number().int().min(0).max(60).optional(),
-    workStartTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(),
-    workEndTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).optional(),
+    workStartTime: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/)
+      .optional(),
+    workEndTime: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/)
+      .optional(),
   }),
 });
 

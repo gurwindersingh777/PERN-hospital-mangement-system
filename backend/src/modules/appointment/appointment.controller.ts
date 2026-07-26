@@ -4,7 +4,6 @@ import { AsyncHandler } from "../../utils/AsyncHandler.js";
 import { GetAppointmentsInput } from "./appointment.schema.js";
 import { appointmentService } from "./appointment.service.js";
 
-
 export const appointmentController = {
   create: AsyncHandler(async (req, res) => {
     const appointment = await appointmentService.create(req.body);
@@ -22,16 +21,18 @@ export const appointmentController = {
     );
     return res
       .status(OK)
-      .json(
-        new ApiResponse(OK, result, "Appointments fetched successfully")
-      );
+      .json(new ApiResponse(OK, result, "Appointments fetched successfully"));
   }),
 
   findById: AsyncHandler(async (req, res) => {
-    const appointment = await appointmentService.findById(req.params.id as string);
+    const appointment = await appointmentService.findById(
+      req.params.id as string
+    );
     return res
       .status(OK)
-      .json(new ApiResponse(OK, appointment, "Appointment fetched successfully"));
+      .json(
+        new ApiResponse(OK, appointment, "Appointment fetched successfully")
+      );
   }),
 
   update: AsyncHandler(async (req, res) => {
@@ -41,6 +42,8 @@ export const appointmentController = {
     );
     return res
       .status(OK)
-      .json(new ApiResponse(OK, appointment, "Appointment updated successfully"));
+      .json(
+        new ApiResponse(OK, appointment, "Appointment updated successfully")
+      );
   }),
 };

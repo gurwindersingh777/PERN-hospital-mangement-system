@@ -1,6 +1,8 @@
 import { AppointmentWithRelations } from "./appointment.types.js";
 
-export const toAppointmentResponse = (appointment: AppointmentWithRelations) => ({
+export const toAppointmentResponse = (
+  appointment: AppointmentWithRelations
+) => ({
   id: appointment.id,
   slotStart: appointment.slotStart,
   slotEnd: appointment.slotEnd,

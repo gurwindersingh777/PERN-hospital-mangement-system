@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { validate } from "../../middlewares/validate.middleware.js";
-import { getPatientsSchema, patientSchema, updatePatientSchema } from "./patient.schema.js";
+import {
+  getPatientsSchema,
+  patientSchema,
+  updatePatientSchema,
+} from "./patient.schema.js";
 import { patientController } from "./patient.controller.js";
 import { authorizeRole } from "../../middlewares/authorizeRole.middleware.js";
 import { UserRole } from "@prisma/client";

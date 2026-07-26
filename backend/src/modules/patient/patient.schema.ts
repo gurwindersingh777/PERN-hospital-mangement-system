@@ -2,28 +2,48 @@ import { BloodGroup, Gender } from "@prisma/client";
 import z from "zod";
 
 export const patientSchema = z.object({
-  body: z.object({
-    userId: z.string().trim().uuid(),
-    dateOfBirth: z.coerce.date(),
-    gender: z.nativeEnum(Gender).optional(),
-    bloodGroup: z.nativeEnum(BloodGroup).optional(),
-    contactNumber: z.string().trim().regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number").optional(),
-    address: z.string().trim().min(2).max(255).optional(),
-    emergencyContact: z.string().trim().regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number").optional(),
-  }).strict()
-})
+  body: z
+    .object({
+      userId: z.string().trim().uuid(),
+      dateOfBirth: z.coerce.date(),
+      gender: z.nativeEnum(Gender).optional(),
+      bloodGroup: z.nativeEnum(BloodGroup).optional(),
+      contactNumber: z
+        .string()
+        .trim()
+        .regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number")
+        .optional(),
+      address: z.string().trim().min(2).max(255).optional(),
+      emergencyContact: z
+        .string()
+        .trim()
+        .regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number")
+        .optional(),
+    })
+    .strict(),
+});
 
 export const updatePatientSchema = z.object({
-  body: z.object({
-    userId: z.string().trim().uuid().optional(),
-    dateOfBirth: z.coerce.date().optional(),
-    gender: z.nativeEnum(Gender).optional(),
-    bloodGroup: z.nativeEnum(BloodGroup).optional(),
-    contactNumber: z.string().trim().regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number").optional(),
-    address: z.string().trim().min(2).max(255).optional(),
-    emergencyContact: z.string().trim().regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number").optional(),
-  }).strict()
-})
+  body: z
+    .object({
+      userId: z.string().trim().uuid().optional(),
+      dateOfBirth: z.coerce.date().optional(),
+      gender: z.nativeEnum(Gender).optional(),
+      bloodGroup: z.nativeEnum(BloodGroup).optional(),
+      contactNumber: z
+        .string()
+        .trim()
+        .regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number")
+        .optional(),
+      address: z.string().trim().min(2).max(255).optional(),
+      emergencyContact: z
+        .string()
+        .trim()
+        .regex(/^\+?[1-9]\d{7,14}$/, "Invalid phone number")
+        .optional(),
+    })
+    .strict(),
+});
 
 export const getPatientsSchema = z.object({
   query: z.object({

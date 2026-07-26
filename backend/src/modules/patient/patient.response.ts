@@ -13,8 +13,6 @@ export const toPatientResponse = (patient: PatientWithRelations) => ({
     id: patient.user.id,
     name: patient.user.name,
     email: patient.user.email,
-    role : patient.user.role
+    role: patient.user.role,
   },
-})
-
-
+});

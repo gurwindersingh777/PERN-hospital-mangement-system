@@ -2,13 +2,15 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../lib/prisma.js";
 
 export const patientRepository = {
-
   create(data: Prisma.PatientUncheckedCreateInput) {
     return prisma.patient.create({ data, include: { user: true } });
   },
 
   findById(id: string) {
-    return prisma.patient.findUnique({ where: { id }, include: { user: true } })
+    return prisma.patient.findUnique({
+      where: { id },
+      include: { user: true },
+    });
   },
 
   findAll(skip: number, take: number) {
@@ -16,9 +18,9 @@ export const patientRepository = {
       skip,
       take,
       include: {
-        user: true
-      }
-    })
+        user: true,
+      },
+    });
   },
 
   update(id: string, data: Prisma.PatientUpdateInput) {
@@ -35,7 +37,6 @@ export const patientRepository = {
     return prisma.patient.findUnique({ where: { userId } });
   },
 
-
   findUserById(userId: string) {
     return prisma.user.findUnique({ where: { id: userId } });
   },
@@ -43,4 +44,4 @@ export const patientRepository = {
   count() {
     return prisma.patient.count();
   },
-}
+};

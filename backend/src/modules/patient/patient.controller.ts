@@ -11,7 +11,11 @@ export const patientController = {
     return res
       .status(CREATED)
       .json(
-        new ApiResponse(CREATED, patient, "Patient profile created successfully")
+        new ApiResponse(
+          CREATED,
+          patient,
+          "Patient profile created successfully"
+        )
       );
   }),
 
@@ -30,7 +34,9 @@ export const patientController = {
     const patient = await patientService.findById(req.params.id as string);
     return res
       .status(OK)
-      .json(new ApiResponse(OK, patient, "Patient profile fetched successfully"));
+      .json(
+        new ApiResponse(OK, patient, "Patient profile fetched successfully")
+      );
   }),
 
   update: AsyncHandler(async (req, res) => {
@@ -40,6 +46,8 @@ export const patientController = {
     );
     return res
       .status(OK)
-      .json(new ApiResponse(OK, patient, "Patient profile updated successfully"));
+      .json(
+        new ApiResponse(OK, patient, "Patient profile updated successfully")
+      );
   }),
 };

@@ -13,7 +13,7 @@ export const toDoctorResponse = (doctor: DoctorWithRelations) => ({
     id: doctor.user.id,
     name: doctor.user.name,
     email: doctor.user.email,
-    role: doctor.user.role
+    role: doctor.user.role,
   },
 
   department: {

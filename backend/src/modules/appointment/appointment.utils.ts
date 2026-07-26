@@ -1,11 +1,13 @@
-import { ALLOWED_SLOT_MINUTES, APPOINTMENT_DURATION_MINUTES } from "./appointment.constants.js";
+import {
+  ALLOWED_SLOT_MINUTES,
+  APPOINTMENT_DURATION_MINUTES,
+} from "./appointment.constants.js";
 
 export function getSlotEnd(slotStart: Date): Date {
   return new Date(
     slotStart.getTime() + APPOINTMENT_DURATION_MINUTES * 60 * 1000
   );
 }
-
 
 export function isValidSlotTime(slotStart: Date): boolean {
   return (
@@ -27,18 +29,12 @@ export function isWithinWorkingHours(
   workStartTime: string,
   workEndTime: string
 ): boolean {
+  const appointmentStart = slotStart.getHours() * 60 + slotStart.getMinutes();
 
-  const appointmentStart =
-    slotStart.getHours() * 60 + slotStart.getMinutes();
-
-  const appointmentEnd =
-    slotEnd.getHours() * 60 + slotEnd.getMinutes();
+  const appointmentEnd = slotEnd.getHours() * 60 + slotEnd.getMinutes();
 
   const doctorStart = getMinutes(workStartTime);
   const doctorEnd = getMinutes(workEndTime);
 
-  return (
-    appointmentStart >= doctorStart &&
-    appointmentEnd <= doctorEnd
-  );
+  return appointmentStart >= doctorStart && appointmentEnd <= doctorEnd;
 }

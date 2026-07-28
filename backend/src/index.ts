@@ -34,6 +34,7 @@ app.use("/api/doctors", authenticate, doctorRouter);
 app.use("/api/patients", authenticate, patientRouter);
 app.use("/api/appointments", authenticate, appointmentRouter);
 app.use("/api/medical-records", authenticate, medicalRecordRouter);
+app.use("/api/prescriptions", authenticate, prescriptionRouter);
 
 app.use(ErrorHandler);
 

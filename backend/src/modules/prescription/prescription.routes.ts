@@ -9,26 +9,26 @@ import {
 } from "./prescription.schema.js";
 import { prescriptionController } from "./prescription.controller.js";
 
-const patientRouter = Router();
+const prescriptionRouter = Router();
 
-patientRouter.get(
+prescriptionRouter.get(
   "/",
   authorizeRole(UserRole.ADMIN),
   validate(getPrescriptionSchema),
   prescriptionController.findAll
 );
-patientRouter.get("/:id", prescriptionController.findById);
-patientRouter.post(
+prescriptionRouter.get("/:id", prescriptionController.findById);
+prescriptionRouter.post(
   "/",
   authorizeRole(UserRole.ADMIN),
   validate(prescriptionSchema),
   prescriptionController.create
 );
-patientRouter.patch(
+prescriptionRouter.patch(
   "/:id",
   authorizeRole(UserRole.ADMIN),
   validate(updatePrescriptionSchema),
   prescriptionController.update
 );
 
-export default patientRouter;
+export default prescriptionRouter;

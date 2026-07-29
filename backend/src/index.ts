@@ -13,6 +13,8 @@ import doctorRouter from "./modules/doctor/doctor.routes.js";
 import patientRouter from "./modules/patient/patient.routes.js";
 import appointmentRouter from "./modules/appointment/appointment.routes.js";
 import medicalRecordRouter from "./modules/medical-record/medicalRecord.routes.js";
+import prescriptionRouter from "./modules/prescription/prescription.routes.js";
+import InvoiceRouter from "./modules/Invoice/invoice.routes.js";
 
 const app = express();
 const PORT = env.PORT;
@@ -26,7 +28,6 @@ app.use(cookieParser());
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, message: "OK" });
 });
-
 app.use("/api/auth", authRouter);
 app.use("/api/users", authenticate, userRouter);
 app.use("/api/departments", authenticate, departmentRouter);
@@ -35,6 +36,7 @@ app.use("/api/patients", authenticate, patientRouter);
 app.use("/api/appointments", authenticate, appointmentRouter);
 app.use("/api/medical-records", authenticate, medicalRecordRouter);
 app.use("/api/prescriptions", authenticate, prescriptionRouter);
+app.use("/api/invoices", authenticate, InvoiceRouter);
 
 app.use(ErrorHandler);
 

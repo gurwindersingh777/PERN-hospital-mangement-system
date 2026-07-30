@@ -11,17 +11,26 @@ import { UserRole } from "@prisma/client";
 
 const patientRouter = Router();
 
-patientRouter.get("/", validate(getPatientsSchema), patientController.findAll);
-patientRouter.get("/:id", patientController.findById);
+patientRouter.get(
+  "/",
+  validate(getPatientsSchema),
+  authorizeRole(UserRole.ADMIN, UserRole.RECEPTIONIST),
+  patientController.findAll
+);
+patientRouter.get(
+  "/:id",
+  authorizeRole(UserRole.ADMIN, UserRole.RECEPTIONIST),
+  patientController.findById
+);
 patientRouter.post(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.RECEPTIONIST),
   validate(patientSchema),
   patientController.create
 );
 patientRouter.patch(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.RECEPTIONIST),
   validate(updatePatientSchema),
   patientController.update
 );

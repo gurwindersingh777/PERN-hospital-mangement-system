@@ -13,27 +13,43 @@ const appointmentRouter = Router();
 
 appointmentRouter.post(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.RECEPTIONIST),
   validate(appointmentSchema),
   appointmentController.create
 );
 
 appointmentRouter.get(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(
+    UserRole.ADMIN,
+    UserRole.DOCTOR,
+    UserRole.RECEPTIONIST,
+    UserRole.PATIENT
+  ),
   validate(getAppointmentsSchema),
   appointmentController.findAll
 );
 
 appointmentRouter.get(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(
+    UserRole.ADMIN,
+    UserRole.DOCTOR,
+    UserRole.RECEPTIONIST,
+    UserRole.PATIENT
+  ),
   appointmentController.findById
 );
 
 appointmentRouter.patch(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(
+    UserRole.ADMIN,
+    UserRole.RECEPTIONIST,
+    UserRole.DOCTOR,
+    UserRole.PATIENT
+  ),
+ 
   validate(updateAppointmentSchema),
   appointmentController.update
 );

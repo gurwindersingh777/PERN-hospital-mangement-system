@@ -13,24 +13,24 @@ const medicalRecordRouter = Router();
 
 medicalRecordRouter.get(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
   validate(getMedicalRecordSchema),
   medicalRecordController.findAll
 );
 medicalRecordRouter.get(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
   medicalRecordController.findById
 );
 medicalRecordRouter.post(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR),
   validate(medicalRecordSchema),
   medicalRecordController.create
 );
 medicalRecordRouter.patch(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR),
   validate(updateMedicalRecordSchema),
   medicalRecordController.update
 );

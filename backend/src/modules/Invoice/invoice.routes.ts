@@ -14,24 +14,24 @@ const InvoiceRouter = Router();
 
 InvoiceRouter.get(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST, UserRole.PATIENT),
   validate(getInvoiceSchema),
   invoiceController.findAll
 );
 InvoiceRouter.get(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST, UserRole.PATIENT),
   invoiceController.findById
 );
 InvoiceRouter.post(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.RECEPTIONIST),
   validate(invoiceSchema),
   invoiceController.create
 );
 InvoiceRouter.patch(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.RECEPTIONIST),
   validate(updateInvoiceSchema),
   invoiceController.update
 );

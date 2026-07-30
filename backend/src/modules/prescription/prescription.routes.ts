@@ -13,20 +13,24 @@ const prescriptionRouter = Router();
 
 prescriptionRouter.get(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
   validate(getPrescriptionSchema),
   prescriptionController.findAll
 );
-prescriptionRouter.get("/:id", prescriptionController.findById);
+prescriptionRouter.get(
+  "/:id",
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  prescriptionController.findById
+);
 prescriptionRouter.post(
   "/",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR),
   validate(prescriptionSchema),
   prescriptionController.create
 );
 prescriptionRouter.patch(
   "/:id",
-  authorizeRole(UserRole.ADMIN),
+  authorizeRole(UserRole.ADMIN, UserRole.DOCTOR),
   validate(updatePrescriptionSchema),
   prescriptionController.update
 );

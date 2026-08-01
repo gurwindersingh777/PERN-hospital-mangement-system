@@ -33,10 +33,12 @@ export const invoiceRepository = {
     });
   },
 
-  findAll(skip: number, take: number) {
+  findAll(skip: number, take: number, where?: Prisma.InvoiceWhereInput) {
     return prisma.invoice.findMany({
       skip,
       take,
+      where,
+      orderBy: { createdAt: "desc" },
       include: invoiceInclude,
     });
   },
@@ -49,8 +51,8 @@ export const invoiceRepository = {
     });
   },
 
-  count() {
-    return prisma.invoice.count();
+  count(where?: Prisma.InvoiceWhereInput) {
+    return prisma.invoice.count({ where });
   },
 
   findAppointmentById(id: string) {

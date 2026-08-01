@@ -17,7 +17,8 @@ export const medicalRecordController = {
 
   findAll: AsyncHandler(async (req, res) => {
     const records = await medicalRecordService.findAll(
-      req.query as unknown as GetMedicalRecordInput
+      req.query as unknown as GetMedicalRecordInput,
+      req.user!
     );
     return res
       .status(OK)

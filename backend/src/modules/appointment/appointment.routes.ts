@@ -8,6 +8,8 @@ import {
   getAppointmentsSchema,
 } from "./appointment.schema.js";
 import { appointmentController } from "./appointment.controller.js";
+import { authorizeOwnership } from "../../middlewares/authorizeOwnership.middleware.js";
+import { OwnershipResource } from "../../ownership/ownership.types.js";
 
 const appointmentRouter = Router();
 
@@ -38,6 +40,10 @@ appointmentRouter.get(
     UserRole.RECEPTIONIST,
     UserRole.PATIENT
   ),
+  authorizeOwnership({
+    resource: OwnershipResource.APPOINTMENT,
+    getResourceId: (req) => req.params.id as string,
+  }),
   appointmentController.findById
 );
 
@@ -49,7 +55,10 @@ appointmentRouter.patch(
     UserRole.DOCTOR,
     UserRole.PATIENT
   ),
- 
+  authorizeOwnership({
+    resource: OwnershipResource.APPOINTMENT,
+    getResourceId: (req) => req.params.id as string,
+  }),
   validate(updateAppointmentSchema),
   appointmentController.update
 );

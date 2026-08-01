@@ -20,10 +20,12 @@ export const prescriptionsRepository = {
     });
   },
 
-  findAll(skip: number, take: number) {
+  findAll(skip: number, take: number, where?: Prisma.PrescriptionWhereInput) {
     return prisma.prescription.findMany({
       skip,
       take,
+      where,
+      orderBy: { createdAt: "desc" },
       include: {
         medicalRecord: true,
       },
@@ -40,8 +42,8 @@ export const prescriptionsRepository = {
     });
   },
 
-  count() {
-    return prisma.prescription.count();
+  count(where?: Prisma.PrescriptionWhereInput) {
+    return prisma.prescription.count({ where });
   },
 
   findMedicalRecordById(id: string) {

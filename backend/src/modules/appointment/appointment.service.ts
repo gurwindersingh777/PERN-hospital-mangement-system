@@ -1,4 +1,4 @@
-import { AppointmentStatus, Prisma } from "@prisma/client";
+import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
 import {
   BAD_REQUEST,
   CONFLICT,
@@ -17,6 +17,7 @@ import {
   isValidSlotTime,
   isWithinWorkingHours,
 } from "./appointment.utils.js";
+import { AuthUser } from "../../types/auth.js";
 
 const allowedTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
   PENDING: ["CONFIRMED", "CANCELLED"],
@@ -34,13 +35,6 @@ function isValidStatusTransition(
 
 export const appointmentService = {
   async create(data: AppointmentInput) {
-    console.log({
-      iso: data.slotStart.toISOString(),
-      hours: data.slotStart.getHours(),
-      minutes: data.slotStart.getMinutes(),
-      utcHours: data.slotStart.getUTCHours(),
-      utcMinutes: data.slotStart.getUTCMinutes(),
-    });
     const doctor = await appointmentRepository.findDoctorById(data.doctorId);
 
     if (!doctor) {
@@ -112,14 +106,38 @@ export const appointmentService = {
     return toAppointmentResponse(appointment);
   },
 
-  async findAll(query: GetAppointmentsInput) {
+  async findAll(query: GetAppointmentsInput, user: AuthUser) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
     const skip = (page - 1) * limit;
 
+    let where: Prisma.AppointmentWhereInput = {};
+
+    switch (user.role) {
+      case UserRole.ADMIN:
+      case UserRole.RECEPTIONIST:
+        break;
+
+      case UserRole.DOCTOR:
+        where = {
+          doctor: {
+            userId: user.userId,
+          },
+        };
+        break;
+
+      case UserRole.PATIENT:
+        where = {
+          patient: {
+            userId: user.userId,
+          },
+        };
+        break;
+    }
+
     const [appointments, total] = await Promise.all([
-      appointmentRepository.findAll(skip, limit),
-      appointmentRepository.count(),
+      appointmentRepository.findAll(skip, limit, where),
+      appointmentRepository.count(where),
     ]);
 
     return {

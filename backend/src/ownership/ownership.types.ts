@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export enum OwnershipResource {
   APPOINTMENT = "appointment",
   MEDICAL_RECORD = "medicalRecord",

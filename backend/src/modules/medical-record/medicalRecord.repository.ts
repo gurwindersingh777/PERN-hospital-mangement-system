@@ -34,10 +34,12 @@ export const medicalRecordRepository = {
     });
   },
 
-  findAll(skip: number, take: number) {
+  findAll(skip: number, take: number, where?: Prisma.MedicalRecordWhereInput) {
     return prisma.medicalRecord.findMany({
       skip,
       take,
+      where,
+      orderBy: { createdAt: "desc" },
       include: medicalRecordInclude,
     });
   },
@@ -50,8 +52,8 @@ export const medicalRecordRepository = {
     });
   },
 
-  count() {
-    return prisma.medicalRecord.count();
+  count(where?: Prisma.MedicalRecordWhereInput) {
+    return prisma.medicalRecord.count({ where });
   },
 
   findAppointmentById(id: string) {

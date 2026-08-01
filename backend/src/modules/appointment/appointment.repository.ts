@@ -30,13 +30,14 @@ export const appointmentRepository = {
     });
   },
 
-  findAll(skip: number, take: number) {
+  findAll(skip: number, take: number, where?: Prisma.AppointmentWhereInput) {
     return prisma.appointment.findMany({
       skip,
       take,
       orderBy: {
         slotStart: "desc",
       },
+      where,
       include: appointmentInclude,
     });
   },
@@ -84,7 +85,7 @@ export const appointmentRepository = {
     });
   },
 
-  count() {
-    return prisma.appointment.count();
+  count(where?: Prisma.AppointmentWhereInput) {
+    return prisma.appointment.count({ where });
   },
 };

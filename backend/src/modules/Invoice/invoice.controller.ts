@@ -15,7 +15,8 @@ export const invoiceController = {
 
   findAll: AsyncHandler(async (req, res) => {
     const invoices = await invoiceService.findAll(
-      req.query as unknown as GetInvoiceInput
+      req.query as unknown as GetInvoiceInput,
+      req.user!
     );
     return res
       .status(OK)

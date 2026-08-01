@@ -21,7 +21,8 @@ export const prescriptionController = {
 
   findAll: AsyncHandler(async (req, res) => {
     const prescriptions = await prescriptionService.findAll(
-      req.query as unknown as GetPrescriptionInput
+      req.query as unknown as GetPrescriptionInput,
+      req.user!
     );
     return res
       .status(OK)

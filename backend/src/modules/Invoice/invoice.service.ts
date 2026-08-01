@@ -1,4 +1,9 @@
-import { AppointmentStatus, InvoiceStatus } from "@prisma/client";
+import {
+  AppointmentStatus,
+  InvoiceStatus,
+  Prisma,
+  UserRole,
+} from "@prisma/client";
 import { invoiceRepository } from "./invoice.repository.js";
 import {
   GetInvoiceInput,
@@ -12,6 +17,7 @@ import {
   NOT_FOUND,
 } from "../../constants/statusCode.js";
 import { toInvoiceResponse } from "./invoice.response.js";
+import { AuthUser } from "../../types/auth.js";
 
 const allowedTransitions: Record<InvoiceStatus, InvoiceStatus[]> = {
   UNPAID: ["PAID", "VOID"],
@@ -69,15 +75,33 @@ export const invoiceService = {
     return toInvoiceResponse(invoice);
   },
 
-  async findAll(query: GetInvoiceInput) {
+  async findAll(query: GetInvoiceInput, user: AuthUser) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
     const skip = (page - 1) * limit;
 
+    let where: Prisma.InvoiceWhereInput = {};
+
+    switch (user.role) {
+      case UserRole.ADMIN:
+      case UserRole.RECEPTIONIST:
+        break;
+
+      case UserRole.PATIENT:
+        where = {
+          appointment: {
+            patient: {
+              userId: user.userId,
+            },
+          },
+        };
+        break;
+    }
+
     const [invoices, total] = await Promise.all([
-      invoiceRepository.findAll(skip, limit),
-      invoiceRepository.count(),
+      invoiceRepository.findAll(skip, limit, where),
+      invoiceRepository.count(where),
     ]);
 
     return {

@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "@prisma/client";
+import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
 import {
   BAD_REQUEST,
   CONFLICT,
@@ -12,6 +12,7 @@ import {
   MedicalRecordInput,
   UpdateMedicalRecordInput,
 } from "./medicalRecord.schema.js";
+import { AuthUser } from "../../types/auth.js";
 
 export const medicalRecordService = {
   async create(data: MedicalRecordInput) {
@@ -56,15 +57,42 @@ export const medicalRecordService = {
     return toMedicalRecordResponse(record);
   },
 
-  async findAll(query: GetMedicalRecordInput) {
+  async findAll(query: GetMedicalRecordInput, user: AuthUser) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
     const skip = (page - 1) * limit;
 
+    let where: Prisma.MedicalRecordWhereInput = {};
+
+    switch (user.role) {
+      case UserRole.ADMIN:
+        break;
+
+      case UserRole.DOCTOR:
+        where = {
+          appointment: {
+            doctor: {
+              userId: user.userId,
+            },
+          },
+        };
+        break;
+
+      case UserRole.PATIENT:
+        where = {
+          appointment: {
+            patient: {
+              userId: user.userId,
+            },
+          },
+        };
+        break;
+    }
+
     const [records, total] = await Promise.all([
-      medicalRecordRepository.findAll(skip, limit),
-      medicalRecordRepository.count(),
+      medicalRecordRepository.findAll(skip, limit, where),
+      medicalRecordRepository.count(where),
     ]);
 
     return {

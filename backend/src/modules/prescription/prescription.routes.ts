@@ -8,6 +8,8 @@ import {
   updatePrescriptionSchema,
 } from "./prescription.schema.js";
 import { prescriptionController } from "./prescription.controller.js";
+import { authorizeOwnership } from "../../middlewares/authorizeOwnership.middleware.js";
+import { OwnershipResource } from "../../ownership/ownership.types.js";
 
 const prescriptionRouter = Router();
 
@@ -20,6 +22,10 @@ prescriptionRouter.get(
 prescriptionRouter.get(
   "/:id",
   authorizeRole(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  authorizeOwnership({
+    resource: OwnershipResource.PRESCRIPTION,
+    getResourceId: (req) => req.params.id as string,
+  }),
   prescriptionController.findById
 );
 prescriptionRouter.post(
@@ -31,6 +37,10 @@ prescriptionRouter.post(
 prescriptionRouter.patch(
   "/:id",
   authorizeRole(UserRole.ADMIN, UserRole.DOCTOR),
+  authorizeOwnership({
+    resource: OwnershipResource.PRESCRIPTION,
+    getResourceId: (req) => req.params.id as string,
+  }),
   validate(updatePrescriptionSchema),
   prescriptionController.update
 );

@@ -17,7 +17,8 @@ export const appointmentController = {
 
   findAll: AsyncHandler(async (req, res) => {
     const result = await appointmentService.findAll(
-      req.query as unknown as GetAppointmentsInput
+      req.query as unknown as GetAppointmentsInput,
+      req.user!
     );
     return res
       .status(OK)

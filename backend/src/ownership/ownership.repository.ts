@@ -1,12 +1,11 @@
 import prisma from "../lib/prisma.js";
-import {
-  OwnershipInfo,
-  OwnershipResource,
-} from "./ownership.types.js";
+import { OwnershipInfo, OwnershipResource } from "./ownership.types.js";
 
 export const ownershipRepository = {
-  async findOwner(resource: OwnershipResource, id: string): Promise<OwnershipInfo | null> {
-
+  async findOwner(
+    resource: OwnershipResource,
+    id: string
+  ): Promise<OwnershipInfo | null> {
     switch (resource) {
       case OwnershipResource.APPOINTMENT: {
         const appointment = await prisma.appointment.findUnique({
@@ -52,8 +51,8 @@ export const ownershipRepository = {
                   },
                 },
               },
-            }
-          }
+            },
+          },
         });
 
         if (!medicalRecord) {
@@ -83,10 +82,10 @@ export const ownershipRepository = {
                       select: {
                         userId: true,
                       },
-                    }
-                  }
-                }
-              }
+                    },
+                  },
+                },
+              },
             },
           },
         });
@@ -116,8 +115,8 @@ export const ownershipRepository = {
                   select: {
                     userId: true,
                   },
-                }
-              }
+                },
+              },
             },
           },
         });
@@ -132,7 +131,8 @@ export const ownershipRepository = {
         };
       }
 
-      default: throw new Error(`Unsupported ownership resource: ${resource}`);
+      default:
+        throw new Error(`Unsupported ownership resource: ${resource}`);
     }
   },
 };

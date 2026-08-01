@@ -1,4 +1,6 @@
+import { Prisma, UserRole } from "@prisma/client";
 import { NOT_FOUND } from "../../constants/statusCode.js";
+import { AuthUser } from "../../types/auth.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { prescriptionsRepository } from "./prescription.repository.js";
 import { toPrescriptionResponse } from "./prescription.response.js";
@@ -33,15 +35,46 @@ export const prescriptionService = {
     return toPrescriptionResponse(prescription);
   },
 
-  async findAll(query: GetPrescriptionInput) {
+  async findAll(query: GetPrescriptionInput, user: AuthUser) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
     const skip = (page - 1) * limit;
 
+    let where: Prisma.PrescriptionWhereInput = {};
+
+    switch (user.role) {
+      case UserRole.ADMIN:
+        break;
+
+      case UserRole.DOCTOR:
+        where = {
+          medicalRecord: {
+            appointment: {
+              doctor: {
+                userId: user.userId,
+              },
+            },
+          },
+        };
+        break;
+
+      case UserRole.PATIENT:
+        where = {
+          medicalRecord: {
+            appointment: {
+              patient: {
+                userId: user.userId,
+              },
+            },
+          },
+        };
+        break;
+    }
+
     const [prescriptions, total] = await Promise.all([
-      prescriptionsRepository.findAll(skip, limit),
-      prescriptionsRepository.count(),
+      prescriptionsRepository.findAll(skip, limit, where),
+      prescriptionsRepository.count(where),
     ]);
 
     return {
